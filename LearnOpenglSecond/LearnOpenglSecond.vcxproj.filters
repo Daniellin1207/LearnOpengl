@@ -23,8 +23,17 @@
     <ClCompile Include="pch.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="LearnOpenglSecond.cpp">
+    <ClCompile Include="proj1.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="vertex.vert">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="fragment.frag">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

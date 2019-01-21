@@ -24,11 +24,29 @@ Shader::Shader(const GLchar * vertexPath, const GLchar * fragmentPath)
 
 		vertexSource = vertexString.c_str();
 		fragmentSource = fragmentString.c_str();
-		printf(vertexSource);
-		printf(fragmentSource);
+
+		unsigned int vertex, fragment;
+		vertex = glCreateShader(GL_VERTEX_SHADER);
+		glShaderSource(vertex, 1, &vertexSource, NULL);
+		glCompileShader(vertex);
+		fragment = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(fragment, 1, &fragmentSource, NULL);
+		glCompileShader(fragment);
+
+		ID = glCreateProgram();
+		glAttachShader(ID, vertex);
+		glAttachShader(ID, fragment);
+		glLinkProgram(ID);
+		glDeleteShader(vertex);
+		glDeleteShader(fragment);
 	}
 	catch (const std::exception& ex)
 	{
 		printf(ex.what());
 	}
+}
+
+void Shader::use()
+{
+	glUseProgram(ID);
 }

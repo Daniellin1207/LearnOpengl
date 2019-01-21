@@ -11,30 +11,6 @@
 #include <assimp/scene.h>
 using namespace std;
 
-const char *vertexShaderSource = ""
-	"#version 330 core										 \n"
-	"layout(location = 0) in vec3 aPos;					 \n"
-	"layout(location = 1) in vec3 aColor;					 \n"
-	"														 \n"
-	"out vec3 Color;														 \n"
-	"void main()											 \n"
-	"{														 \n"
-	"	gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);	 \n"
-	"   Color=aColor;										\n"
-	"}														 \n";
-
-const char *fragmentShaderSource = ""
-	"#version 330 core										 \n"
-	"out vec4 FragColor;				 \n"
-	"in vec3 Color;				 \n"
-	"														 \n"
-	//"uniform vec4 ourColor;													 \n"
-	"void main()											 \n"
-	"{														 \n"
-	"	FragColor = vec4(Color,1.0f);	 \n"
-	"}														 \n";
-
-
 void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
@@ -46,8 +22,6 @@ float vertices[] = {
 };
 int main()
 {
-	Shader* testShader = new Shader("vertex.vert", "fragment.frag");
-	//testShader->use();
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -72,6 +46,7 @@ int main()
 	}
 	glViewport(0, 0, 800, 600);
 
+	Shader* testShader = new Shader("vertex.vert", "fragment.frag");
 
 #pragma region Shader
 	unsigned int VAO,VBO;
@@ -85,24 +60,6 @@ int main()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(3*sizeof(float)));
 	glEnableVertexAttribArray(1);
-
-	unsigned int vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-
-	unsigned int fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-
-	unsigned int shaderProgram;
-	shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
 #pragma endregion
 
 	while (!glfwWindowShouldClose(window)) {
@@ -111,7 +68,7 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glUseProgram(shaderProgram);
+		testShader->use();
 
 		//float timeValue = glfwGetTime();
 		//float greenValue = (sin(timeValue) / 2.0f) + 0.5f;

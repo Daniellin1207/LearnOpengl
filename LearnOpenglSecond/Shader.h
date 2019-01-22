@@ -21,6 +21,6 @@ public:
 	const char* fragmentSource;
 	void use();
 private:
-
+	void checkCompileErrors(unsigned int ID, std::string type);
 };
 

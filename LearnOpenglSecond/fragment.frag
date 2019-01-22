@@ -5,5 +5,5 @@ in vec3 Color;
 //uniform vec4 ourColor;	
 void main()					
 {							
-	FragColor = vec4(Color,1.0f);	
+	FragColor = vec2224(Color,1.0f);	
 }									

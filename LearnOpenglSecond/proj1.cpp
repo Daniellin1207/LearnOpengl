@@ -11,15 +11,25 @@
 #include <assimp/scene.h>
 using namespace std;
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 float vertices[] = {
-	// 位置              // 颜色
-	 0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // 右下
-	-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // 左下
-	 0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // 顶部
+	// positions          // colors           // texture coords
+	 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+	 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+	-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
 };
+unsigned int indices[] = {
+	0, 1, 3, // first triangle
+	1, 2, 3  // second triangle
+};
+
+
 int main()
 {
 	glfwInit();
@@ -49,18 +59,60 @@ int main()
 	Shader* testShader = new Shader("vertex.vert", "fragment.frag");
 
 #pragma region Shader
-	unsigned int VAO,VBO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
+	unsigned int VAO,VBO,EBO;
 
+	glGenVertexArrays(1, &VAO); // GenBuffers
 	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
+
+	glBindVertexArray(VAO);  // BindBuffers
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // BindDatas
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0); // TransDatas
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(3*sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(3*sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 #pragma endregion
+
+	unsigned int TexBufferA;
+	glGenTextures(1, &TexBufferA);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, TexBufferA);
+
+	int width, height, nrChannel;
+	stbi_set_flip_vertically_on_load(true); // 颠倒载入
+	unsigned char *data = stbi_load("container.jpg", &width, &height, &nrChannel, 0);
+	if (data) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else {
+		printf("load image failed.");
+	}
+	stbi_image_free(data);
+
+	unsigned int TexBufferB;
+	glGenTextures(1, &TexBufferB);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, TexBufferB);
+
+	//int width, height, nrChannel;
+	unsigned char *data2 = stbi_load("awesomeface.png", &width, &height, &nrChannel, 0);
+	if (data2) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else {
+		printf("load image failed.");
+	}
+	stbi_image_free(data2);
+
 
 	while (!glfwWindowShouldClose(window)) {
 		processInput(window);
@@ -68,7 +120,16 @@ int main()
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, TexBufferA);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, TexBufferB);
+		glBindVertexArray(VAO);
+
+
 		testShader->use();
+		glUniform1i(glGetUniformLocation(testShader->ID, "ourTexture"), 0);
+		glUniform1i(glGetUniformLocation(testShader->ID, "faceTexture"), 1);
 
 		//float timeValue = glfwGetTime();
 		//float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
@@ -76,7 +137,8 @@ int main()
 		//glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0,sizeof(vertices));
+		//glDrawArrays(GL_TRIANGLES, 0,sizeof(vertices));
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);

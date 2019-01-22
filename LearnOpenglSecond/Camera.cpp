@@ -30,7 +30,7 @@ Camera::~Camera()
 
 glm::mat4 Camera::GetViewMatrix()
 {
-	return glm::lookAt(Position,Position+Forward,WorldUp);
+	return glm::lookAt(Position, Position + Forward, WorldUp);
 	//return glm::mat4(1.0f);
 }
 
@@ -46,8 +46,8 @@ void Camera::UpdateCameraVectors()
 
 void Camera::ProcessMouseMovement(float deltaX, float deltaY)
 {
-	Pitch += deltaY*MouseSensitivity;
-	Yaw += deltaX*MouseSensitivity;
+	Pitch += deltaY * MouseSensitivity;
+	Yaw += deltaX * MouseSensitivity;
 	if (Pitch > 89.0) Pitch = 89.0;
 	else if (Pitch < -89.0) Pitch = -89.0;
 	UpdateCameraVectors();

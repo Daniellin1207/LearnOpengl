@@ -47,35 +47,35 @@ float vertices[] = {
 	 0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
 	-0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
 	-0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-						 
+
 	-0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
 	 0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
 	 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
 	 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
 	-0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
 	-0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-						 
+
 	-0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
 	-0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
 	-0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
 	-0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
 	-0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
 	-0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-						 
+
 	 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
 	 0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
 	 0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
 	 0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
 	 0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
 	 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-						 
+
 	-0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
 	 0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
 	 0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
 	 0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
 	-0.5f, -0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
 	-0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-						 
+
 	-0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
 	 0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
 	 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
@@ -118,7 +118,7 @@ int main()
 	glfwSetScrollCallback(window, scroll_callback);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glewExperimental = true;
-	if (glewInit()!=GLEW_OK)
+	if (glewInit() != GLEW_OK)
 	{
 		printf("Init GLEW failed.");
 		glfwTerminate();
@@ -129,7 +129,7 @@ int main()
 	Shader* testShader = new Shader("vertex.vert", "fragment.frag");
 
 #pragma region Shader
-	unsigned int VAO,VBO,EBO;
+	unsigned int VAO, VBO, EBO;
 
 	glGenVertexArrays(1, &VAO); // GenBuffers
 	glGenBuffers(1, &VBO);
@@ -185,7 +185,7 @@ int main()
 
 	glm::mat4 modelMat = glm::mat4(1.0f);
 	//modelMat = glm::translate(modelMat, glm::vec3(0.0f, 0.0f, -3.0f));
-	modelMat = glm::rotate(modelMat, glm::radians(-55.0f),glm::vec3(1.0f, 0.0f, 0.0f));
+	modelMat = glm::rotate(modelMat, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
 	//glm::mat4 viewMat=glm::mat4(1.0f); 
 	glm::mat4 viewMat;
@@ -216,7 +216,7 @@ int main()
 		for (int i = 0; i < 10; i++)
 		{
 			glm::mat4 projMat = glm::perspective(glm::radians(camera.Zoom), 800.0f / 600.0f, 0.1f, 1000.0f);
-			glm::mat4 modelMat2=glm::mat4(1.0f);
+			glm::mat4 modelMat2 = glm::mat4(1.0f);
 			modelMat2 = glm::translate(modelMat2, cubePositions[i]);
 			float angle = 20.0f*i;
 			modelMat2 = glm::rotate(modelMat2, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
@@ -233,7 +233,7 @@ int main()
 			//int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
 			//glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
-			glDrawArrays(GL_TRIANGLES, 0,36);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
 			//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 		glfwPollEvents();
@@ -287,6 +287,6 @@ void mouse_callback(GLFWwindow * window, double xpos, double ypos)
 
 void scroll_callback(GLFWwindow * window, double xoffset, double yoffset)
 {
-	printf("mouseScroll: %f %f\n",xoffset,yoffset);
+	printf("mouseScroll: %f %f\n", xoffset, yoffset);
 	camera.ProcessMouseScroll(yoffset);
 }

@@ -15,8 +15,8 @@ const float ZOOM = 45.0f;
 class Camera
 {
 public:
-	Camera(glm::vec3 position,glm::vec3 target,glm::vec3 worldup);
-	Camera(glm::vec3 position,float pitch,float yaw,glm::vec3 worldup);
+	Camera(glm::vec3 position, glm::vec3 target, glm::vec3 worldup);
+	Camera(glm::vec3 position, float pitch, float yaw, glm::vec3 worldup);
 	~Camera();
 
 	glm::vec3 Position;
@@ -28,9 +28,9 @@ public:
 	float Pitch;
 	float Yaw;
 
-	float MovementSpeed=0.01;
-	float MouseSensitivity=0.001;
-	float Zoom=45.0;
+	float MovementSpeed = 0.01;
+	float MouseSensitivity = 0.001;
+	float Zoom = 45.0;
 
 	glm::mat4 GetViewMatrix();
 	void ProcessMouseMovement(float deltaX, float deltaY);

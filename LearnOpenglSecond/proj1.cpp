@@ -181,16 +181,16 @@ int main()
 	viewMat = glm::translate(viewMat, glm::vec3(0.0f, 0.0f, -3.0f));
 
 	glm::mat4 projMat = glm::mat4(1.0f);
-	projMat = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+	projMat = glm::perspective(glm::radians(90.0f), 800.0f / 600.0f, 0.1f, 1000.0f);
 
 	while (!glfwWindowShouldClose(window)) {
 
 		// glm::mat4 trans; // 老版本的glm初始定义即可
-		glm::mat4 trans = glm::mat4(1.0f);
-		trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
-		trans=glm::translate(trans, glm::vec3(0.5f,0.5f,0.0f));
-		//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0, 0, 1.0f));
-		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0, 0, 1.0f));
+		//glm::mat4 trans = glm::mat4(1.0f);
+		//trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+		//trans=glm::translate(trans, glm::vec3(0.5f,0.5f,0.0f));
+		////trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0, 0, 1.0f));
+		//trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0, 0, 1.0f));
 
 		processInput(window);
 
@@ -204,22 +204,30 @@ int main()
 		glBindVertexArray(VAO);
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
+		for (int i = 0; i < 10; i++)
+		{
+			glm::mat4 modelMat2=glm::mat4(1.0f);
+			modelMat2 = glm::translate(modelMat2, cubePositions[i]);
+			float angle = 20.0f*i;
+			modelMat2 = glm::rotate(modelMat2, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			testShader->use();
+			glUniform1i(glGetUniformLocation(testShader->ID, "ourTexture"), 0);
+			glUniform1i(glGetUniformLocation(testShader->ID, "faceTexture"), 1);
+			//glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "transform"), 1, GL_FALSE, glm::value_ptr(trans));
+			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "modelMat"), 1, GL_FALSE, glm::value_ptr(modelMat2));
+			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "viewMat"), 1, GL_FALSE, glm::value_ptr(viewMat));
+			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
 
-		testShader->use();
-		glUniform1i(glGetUniformLocation(testShader->ID, "ourTexture"), 0);
-		glUniform1i(glGetUniformLocation(testShader->ID, "faceTexture"), 1);
-		//glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "transform"), 1, GL_FALSE, glm::value_ptr(trans));
-		glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "modelMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
-		glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "viewMat"), 1, GL_FALSE, glm::value_ptr(viewMat));
-		glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
+			//float timeValue = glfwGetTime();
+			//float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+			//int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+			//glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
-		//float timeValue = glfwGetTime();
-		//float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-		//int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-		//glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+			glDrawArrays(GL_TRIANGLES, 0,36);
+			//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		glDrawArrays(GL_TRIANGLES, 0,sizeof(vertices));
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		}
+
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);

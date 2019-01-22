@@ -14,6 +14,10 @@ using namespace std;
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
@@ -114,7 +118,16 @@ int main()
 	stbi_image_free(data2);
 
 
+
 	while (!glfwWindowShouldClose(window)) {
+
+		// glm::mat4 trans; // 老版本的glm初始定义即可
+		glm::mat4 trans = glm::mat4(1.0f);
+		trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+		trans=glm::translate(trans, glm::vec3(0.5f,0.5f,0.0f));
+		//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0, 0, 1.0f));
+		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0, 0, 1.0f));
+
 		processInput(window);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -125,18 +138,19 @@ int main()
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, TexBufferB);
 		glBindVertexArray(VAO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
 
 		testShader->use();
 		glUniform1i(glGetUniformLocation(testShader->ID, "ourTexture"), 0);
 		glUniform1i(glGetUniformLocation(testShader->ID, "faceTexture"), 1);
+		glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "transform"), 1, GL_FALSE, glm::value_ptr(trans));
 
 		//float timeValue = glfwGetTime();
 		//float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
 		//int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
 		//glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
-		glBindVertexArray(VAO);
 		//glDrawArrays(GL_TRIANGLES, 0,sizeof(vertices));
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 

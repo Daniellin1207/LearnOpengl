@@ -20,9 +20,14 @@ using namespace std;
 
 #include "Camera.h"
 
-void processInput(GLFWwindow *window);
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
+Camera camera(glm::vec3(0, 0.0, 3.0f), glm::vec3(0, 0, 0), glm::vec3(0, 1.0f, 0));
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void processInput(GLFWwindow *window);
+bool firstMouse = true;
+double lastX, lastY;
 //float vertices[] = {
 //	// positions          // colors           // texture coords
 //	 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
@@ -108,6 +113,9 @@ int main()
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, scroll_callback);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glewExperimental = true;
 	if (glewInit()!=GLEW_OK)
@@ -136,7 +144,7 @@ int main()
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0); // TransDatas
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(3*sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
@@ -175,16 +183,15 @@ int main()
 	}
 	stbi_image_free(data2);
 
-	Camera camera(glm::vec3(0, 0.0, 3.0f), glm::vec3(0, 0, 0), glm::vec3(0, 1.0f, 0));
-
 	glm::mat4 modelMat = glm::mat4(1.0f);
 	//modelMat = glm::translate(modelMat, glm::vec3(0.0f, 0.0f, -3.0f));
 	modelMat = glm::rotate(modelMat, glm::radians(-55.0f),glm::vec3(1.0f, 0.0f, 0.0f));
 
-	glm::mat4 viewMat = camera.GetViewMatrix();
+	//glm::mat4 viewMat=glm::mat4(1.0f); 
+	glm::mat4 viewMat;
 
-	glm::mat4 projMat = glm::mat4(1.0f);
-	projMat = glm::perspective(glm::radians(90.0f), 800.0f / 600.0f, 0.1f, 1000.0f);
+	//glm::mat4 projMat = glm::mat4(1.0f);
+	//projMat = glm::perspective(glm::radians(90.0f), 800.0f / 600.0f, 0.1f, 1000.0f);
 
 	while (!glfwWindowShouldClose(window)) {
 
@@ -194,9 +201,8 @@ int main()
 		//trans=glm::translate(trans, glm::vec3(0.5f,0.5f,0.0f));
 		////trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0, 0, 1.0f));
 		//trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0, 0, 1.0f));
-
 		processInput(window);
-
+		viewMat = camera.GetViewMatrix();
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -209,6 +215,7 @@ int main()
 
 		for (int i = 0; i < 10; i++)
 		{
+			glm::mat4 projMat = glm::perspective(glm::radians(camera.Zoom), 800.0f / 600.0f, 0.1f, 1000.0f);
 			glm::mat4 modelMat2=glm::mat4(1.0f);
 			modelMat2 = glm::translate(modelMat2, cubePositions[i]);
 			float angle = 20.0f*i;
@@ -228,10 +235,7 @@ int main()
 
 			glDrawArrays(GL_TRIANGLES, 0,36);
 			//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
 		}
-
-
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}
@@ -239,12 +243,50 @@ int main()
 	return 0;
 }
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+	glViewport(0, 0, width, height);
+}
+
 void processInput(GLFWwindow *window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+	else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		camera.Position += camera.Forward*camera.MovementSpeed;
+	else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		camera.Position -= camera.Forward*camera.MovementSpeed;
+	else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		camera.Position -= camera.Right*camera.MovementSpeed;
+	else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		camera.Position += camera.Right*camera.MovementSpeed;
+	else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		camera.Position -= camera.Up*camera.MovementSpeed;
+	else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		camera.Position += camera.Up*camera.MovementSpeed;
+	else return;
 }
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+
+void mouse_callback(GLFWwindow * window, double xpos, double ypos)
 {
-	glViewport(0, 0, width, height);
+	printf("mouseMove: %f %f\n", xpos, ypos);
+	if (firstMouse == true) {
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+		return;
+	}
+	float deltaX, deltaY;
+	deltaX = xpos - lastX;
+	deltaY = ypos - lastY;
+
+	lastX = xpos;
+	lastY = ypos;
+	camera.ProcessMouseMovement(deltaX, -deltaY);
+}
+
+void scroll_callback(GLFWwindow * window, double xoffset, double yoffset)
+{
+	printf("mouseScroll: %f %f\n",xoffset,yoffset);
+	camera.ProcessMouseScroll(yoffset);
 }

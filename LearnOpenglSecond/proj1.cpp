@@ -18,6 +18,8 @@ using namespace std;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Camera.h"
+
 void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
@@ -173,12 +175,13 @@ int main()
 	}
 	stbi_image_free(data2);
 
+	Camera camera(glm::vec3(0, 0.0, 3.0f), glm::vec3(0, 0, 0), glm::vec3(0, 1.0f, 0));
+
 	glm::mat4 modelMat = glm::mat4(1.0f);
 	//modelMat = glm::translate(modelMat, glm::vec3(0.0f, 0.0f, -3.0f));
 	modelMat = glm::rotate(modelMat, glm::radians(-55.0f),glm::vec3(1.0f, 0.0f, 0.0f));
 
-	glm::mat4 viewMat = glm::mat4(1.0f);
-	viewMat = glm::translate(viewMat, glm::vec3(0.0f, 0.0f, -3.0f));
+	glm::mat4 viewMat = camera.GetViewMatrix();
 
 	glm::mat4 projMat = glm::mat4(1.0f);
 	projMat = glm::perspective(glm::radians(90.0f), 800.0f / 600.0f, 0.1f, 1000.0f);

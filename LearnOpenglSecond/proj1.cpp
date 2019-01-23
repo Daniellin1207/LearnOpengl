@@ -93,9 +93,14 @@ glm::vec3 cubePositions[] = {
 	glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
-float lightCube[] = {0,0.5,0,
-0,0,0,
-0.5,0,1.5};
+float lightCube[] = {
+	0,0.5,  2.0,
+	0,0,    2.0,
+	0.5,0,  2.0,
+
+	0,0.5,  2.0,
+	0.5,0,  2.0,
+	0.5,0.5,2.0};
 #pragma endregion
 
 int main()
@@ -141,14 +146,11 @@ int main()
 	glGenVertexArrays(2, VAOs); // GenBuffers
 	glGenBuffers(2, VBOs);
 	//glGenBuffers(1, &EBO);
-
 	glBindVertexArray(VAOs[0]);  // BindBuffers
 	glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // BindDatas
 	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0); // TransDatas
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(3 * sizeof(float)));
@@ -160,7 +162,8 @@ int main()
 	// 只需要绑定VBO不用再次设置VBO的数据，因为箱子的VBO数据中已经包含了正确的立方体顶点数据
 	glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
 	// 设置灯立方体的顶点属性（对我们的灯来说仅仅只有位置数据）
-	glBufferData(GL_ARRAY_BUFFER, sizeof(lightCube), lightCube, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(lightCube), lightCube, GL_STATIC_DRAW); // BindDatas
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // BindDatas
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
@@ -225,11 +228,11 @@ int main()
 #pragma endregion
 		for (int i = 0; i < 10; i++)
 		{
+			float angle = 20.0f*i+10.0;
 			modelMat = glm::mat4(1.0f);
-			viewMat = camera.GetViewMatrix();
 			modelMat = glm::translate(modelMat, cubePositions[i]);
-			float angle = 20.0f*i;
 			modelMat = glm::rotate(modelMat, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			viewMat = camera.GetViewMatrix();
 			projMat = glm::perspective(glm::radians(camera.Zoom), 800.0f / 600.0f, 0.1f, 1000.0f);
 #pragma region Operation testShader 
 			// 在testShader中 significant!!!
@@ -275,7 +278,7 @@ int main()
 #pragma endregion
 
 #pragma region Draw Call
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 #pragma endregion
 

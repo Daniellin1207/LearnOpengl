@@ -1,3 +1,4 @@
+#pragma region include
 #include "pch.h"
 #define GLEW_STATIC
 #include <gl/glew.h>
@@ -19,27 +20,22 @@ using namespace std;
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Camera.h"
+#pragma endregion
 
+#pragma region Camera Declare
+Camera camera(glm::vec3(0, 0.0, 3.0f), 10.0f,0.0f, glm::vec3(0, 1.0f, 0));
+#pragma endregion
 
-Camera camera(glm::vec3(0, 0.0, 3.0f), glm::vec3(0, 0, 0), glm::vec3(0, 1.0f, 0));
+#pragma region Funcion Declare
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 bool firstMouse = true;
 double lastX, lastY;
-//float vertices[] = {
-//	// positions          // colors           // texture coords
-//	 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
-//	 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
-//	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-//	-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
-//};
-//unsigned int indices[] = {
-//	0, 1, 3, // first triangle
-//	1, 2, 3  // second triangle
-//};
+#pragma endregion
 
+#pragma region Data Declare
 float vertices[] = {
 	-0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
 	 0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
@@ -97,8 +93,14 @@ glm::vec3 cubePositions[] = {
 	glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
+float lightCube[] = {0,0.5,0,
+0,0,0,
+0.5,0,1.5};
+#pragma endregion
+
 int main()
 {
+#pragma region Init Setting
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -126,17 +128,22 @@ int main()
 	}
 	glViewport(0, 0, 800, 600);
 	glEnable(GL_DEPTH_TEST);
-	Shader* testShader = new Shader("vertex.vert", "fragment.frag");
+#pragma endregion
 
 #pragma region Shader
-	unsigned int VAO, VBO, EBO;
+	Shader* testShader = new Shader("vertex.vert", "fragment.frag");
+	Shader* myShader = new Shader("VertLight.vert", "FragLight.frag");
+#pragma endregion
 
-	glGenVertexArrays(1, &VAO); // GenBuffers
-	glGenBuffers(1, &VBO);
+#pragma region VAO and VBO
+	unsigned int VAOs[2], VBOs[2], EBOs;
+
+	glGenVertexArrays(2, VAOs); // GenBuffers
+	glGenBuffers(2, VBOs);
 	//glGenBuffers(1, &EBO);
 
-	glBindVertexArray(VAO);  // BindBuffers
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindVertexArray(VAOs[0]);  // BindBuffers
+	glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // BindDatas
@@ -148,8 +155,18 @@ int main()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
+
+	glBindVertexArray(VAOs[1]);
+	// 只需要绑定VBO不用再次设置VBO的数据，因为箱子的VBO数据中已经包含了正确的立方体顶点数据
+	glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
+	// 设置灯立方体的顶点属性（对我们的灯来说仅仅只有位置数据）
+	glBufferData(GL_ARRAY_BUFFER, sizeof(lightCube), lightCube, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
 #pragma endregion
 
+#pragma region Texture Setting
 	unsigned int TexBufferA;
 	glGenTextures(1, &TexBufferA);
 	glActiveTexture(GL_TEXTURE0);
@@ -182,60 +199,88 @@ int main()
 		printf("load image failed.");
 	}
 	stbi_image_free(data2);
-
-	glm::mat4 modelMat = glm::mat4(1.0f);
-	//modelMat = glm::translate(modelMat, glm::vec3(0.0f, 0.0f, -3.0f));
-	modelMat = glm::rotate(modelMat, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
-	//glm::mat4 viewMat=glm::mat4(1.0f); 
-	glm::mat4 viewMat;
-
-	//glm::mat4 projMat = glm::mat4(1.0f);
-	//projMat = glm::perspective(glm::radians(90.0f), 800.0f / 600.0f, 0.1f, 1000.0f);
+#pragma endregion
 
 	while (!glfwWindowShouldClose(window)) {
 
-		// glm::mat4 trans; // 老版本的glm初始定义即可
-		//glm::mat4 trans = glm::mat4(1.0f);
-		//trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
-		//trans=glm::translate(trans, glm::vec3(0.5f,0.5f,0.0f));
-		////trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0, 0, 1.0f));
-		//trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0, 0, 1.0f));
 		processInput(window);
-		viewMat = camera.GetViewMatrix();
+
+#pragma region GL_FUNCTION SETTING
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+#pragma endregion
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, TexBufferA);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, TexBufferB);
-		glBindVertexArray(VAO);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		testShader->use();
+		glBindVertexArray(VAOs[0]);
+#pragma region MVP Matrix
+		glm::mat4 viewMat = glm::mat4(1.0f);
+		glm::mat4 modelMat = glm::mat4(1.0f);
+		glm::mat4 projMat = glm::mat4(1.0f); 
+#pragma endregion
 		for (int i = 0; i < 10; i++)
 		{
-			glm::mat4 projMat = glm::perspective(glm::radians(camera.Zoom), 800.0f / 600.0f, 0.1f, 1000.0f);
-			glm::mat4 modelMat2 = glm::mat4(1.0f);
-			modelMat2 = glm::translate(modelMat2, cubePositions[i]);
+			modelMat = glm::mat4(1.0f);
+			viewMat = camera.GetViewMatrix();
+			modelMat = glm::translate(modelMat, cubePositions[i]);
 			float angle = 20.0f*i;
-			modelMat2 = glm::rotate(modelMat2, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			testShader->use();
+			modelMat = glm::rotate(modelMat, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			projMat = glm::perspective(glm::radians(camera.Zoom), 800.0f / 600.0f, 0.1f, 1000.0f);
+#pragma region Operation testShader 
+			// 在testShader中 significant!!!
+	#pragma region Data Trans2GPU
+			// 传Texture
 			glUniform1i(glGetUniformLocation(testShader->ID, "ourTexture"), 0);
 			glUniform1i(glGetUniformLocation(testShader->ID, "faceTexture"), 1);
-			//glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "transform"), 1, GL_FALSE, glm::value_ptr(trans));
-			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "modelMat"), 1, GL_FALSE, glm::value_ptr(modelMat2));
+			// 传Matrix
+			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "modelMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
 			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "viewMat"), 1, GL_FALSE, glm::value_ptr(viewMat));
 			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
+	#pragma endregion
+
+	#pragma region TIME GET
 
 			//float timeValue = glfwGetTime();
 			//float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
 			//int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
 			//glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+	#pragma endregion
 
+	#pragma region Draw Call
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 			//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	#pragma endregion
+
+#pragma endregion
 		}
+
+		glBindVertexArray(VAOs[1]);
+
+#pragma region Operation myShader 
+		// 在myShader中 significant!!!
+		myShader->use();
+#pragma region Data Trans2GPU
+		// 传Texture
+		glUniform1i(glGetUniformLocation(myShader->ID, "ourTexture"), 0);
+		glUniform1i(glGetUniformLocation(myShader->ID, "faceTexture"), 1);
+		// 传Matrix
+		glUniformMatrix4fv(glGetUniformLocation(myShader->ID, "modelMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
+		glUniformMatrix4fv(glGetUniformLocation(myShader->ID, "viewMat"), 1, GL_FALSE, glm::value_ptr(viewMat));
+		glUniformMatrix4fv(glGetUniformLocation(myShader->ID, "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
+#pragma endregion
+
+#pragma region Draw Call
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+#pragma endregion
+
+#pragma endregion
+
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}
@@ -243,6 +288,7 @@ int main()
 	return 0;
 }
 
+#pragma region Function Define
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
@@ -282,6 +328,7 @@ void mouse_callback(GLFWwindow * window, double xpos, double ypos)
 
 	lastX = xpos;
 	lastY = ypos;
+	printf("mouseDelta: %f %f\n", deltaX, deltaY);
 	camera.ProcessMouseMovement(deltaX, -deltaY);
 }
 
@@ -290,3 +337,4 @@ void scroll_callback(GLFWwindow * window, double xoffset, double yoffset)
 	printf("mouseScroll: %f %f\n", xoffset, yoffset);
 	camera.ProcessMouseScroll(yoffset);
 }
+#pragma endregion

@@ -50,6 +50,12 @@
       <Filter>源文件</Filter>
     </None>
     <None Include="packages.config" />
+    <None Include="VertLight.vert">
+      <Filter>源文件</Filter>
+    </None>
+    <None Include="FragLight.frag">
+      <Filter>源文件</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="wall.jpg">

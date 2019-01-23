@@ -180,9 +180,11 @@
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="FragLight.frag" />
     <None Include="fragment.frag" />
     <None Include="packages.config" />
     <None Include="vertex.vert" />
+    <None Include="VertLight.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="awesomeface.png" />

@@ -181,7 +181,7 @@ int main()
 		processInput(window);
 
 #pragma region GL_FUNCTION SETTING
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0,0,0, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 #pragma endregion
 
@@ -216,6 +216,7 @@ int main()
 			glUniform3f(glGetUniformLocation(testShader->ID, "ambientColor"),0,1,0);
 			glUniform3f(glGetUniformLocation(testShader->ID, "lightPos"),10,10,10);
 			glUniform3f(glGetUniformLocation(testShader->ID, "lightColor"),1.0,0,0);
+			glUniform3f(glGetUniformLocation(testShader->ID, "cameraPos"),camera.Position.x,camera.Position.y,camera.Position.z);
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}

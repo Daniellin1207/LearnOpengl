@@ -31,6 +31,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
+unsigned LoadImageToGPU(const char* filename,GLint internalformat,GLenum format,int slot);
 bool firstMouse = true;
 double lastX, lastY;
 #pragma endregion
@@ -170,38 +171,9 @@ int main()
 #pragma endregion
 
 #pragma region Texture Setting
-	unsigned int TexBufferA;
-	glGenTextures(1, &TexBufferA);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, TexBufferA);
-
-	int width, height, nrChannel;
-	stbi_set_flip_vertically_on_load(true); // 颠倒载入
-	unsigned char *data = stbi_load("container.jpg", &width, &height, &nrChannel, 0);
-	if (data) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else {
-		printf("load image failed.");
-	}
-	stbi_image_free(data);
-
-	unsigned int TexBufferB;
-	glGenTextures(1, &TexBufferB);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, TexBufferB);
-
-	//int width, height, nrChannel;
-	unsigned char *data2 = stbi_load("awesomeface.png", &width, &height, &nrChannel, 0);
-	if (data2) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else {
-		printf("load image failed.");
-	}
-	stbi_image_free(data2);
+	unsigned int TexBufferA, TexBufferB;
+	TexBufferA = LoadImageToGPU("container.jpg", GL_RGB, GL_RGB, 0);
+	TexBufferB = LoadImageToGPU("awesomeface.png", GL_RGBA, GL_RGBA, 1);
 #pragma endregion
 
 	while (!glfwWindowShouldClose(window)) {
@@ -218,14 +190,12 @@ int main()
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, TexBufferB);
 
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+#pragma region TenCube Drawing
 		testShader->use();
 		glBindVertexArray(VAOs[0]);
-#pragma region MVP Matrix
 		glm::mat4 viewMat = glm::mat4(1.0f);
 		glm::mat4 modelMat = glm::mat4(1.0f);
 		glm::mat4 projMat = glm::mat4(1.0f); 
-#pragma endregion
 		for (int i = 0; i < 10; i++)
 		{
 			float angle = 20.0f*i+10.0;
@@ -234,9 +204,6 @@ int main()
 			modelMat = glm::rotate(modelMat, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 			viewMat = camera.GetViewMatrix();
 			projMat = glm::perspective(glm::radians(camera.Zoom), 800.0f / 600.0f, 0.1f, 1000.0f);
-#pragma region Operation testShader 
-			// 在testShader中 significant!!!
-	#pragma region Data Trans2GPU
 			// 传Texture
 			glUniform1i(glGetUniformLocation(testShader->ID, "ourTexture"), 0);
 			glUniform1i(glGetUniformLocation(testShader->ID, "faceTexture"), 1);
@@ -244,44 +211,21 @@ int main()
 			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "modelMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
 			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "viewMat"), 1, GL_FALSE, glm::value_ptr(viewMat));
 			glUniformMatrix4fv(glGetUniformLocation(testShader->ID, "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
-	#pragma endregion
+			// 传Light
+			glUniform3f(glGetUniformLocation(testShader->ID, "objColor"),1.0f,0.5f,0.31);
+			glUniform3f(glGetUniformLocation(testShader->ID, "ambientColor"),0,1,0);
 
-	#pragma region TIME GET
-
-			//float timeValue = glfwGetTime();
-			//float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-			//int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-			//glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-	#pragma endregion
-
-	#pragma region Draw Call
 			glDrawArrays(GL_TRIANGLES, 0, 36);
-			//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	#pragma endregion
-
-#pragma endregion
 		}
-
-		glBindVertexArray(VAOs[1]);
+#pragma endregion
 
 #pragma region Operation myShader 
-		// 在myShader中 significant!!!
 		myShader->use();
-#pragma region Data Trans2GPU
-		// 传Texture
-		glUniform1i(glGetUniformLocation(myShader->ID, "ourTexture"), 0);
-		glUniform1i(glGetUniformLocation(myShader->ID, "faceTexture"), 1);
-		// 传Matrix
+		glBindVertexArray(VAOs[1]);
 		glUniformMatrix4fv(glGetUniformLocation(myShader->ID, "modelMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
 		glUniformMatrix4fv(glGetUniformLocation(myShader->ID, "viewMat"), 1, GL_FALSE, glm::value_ptr(viewMat));
 		glUniformMatrix4fv(glGetUniformLocation(myShader->ID, "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
-#pragma endregion
-
-#pragma region Draw Call
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-#pragma endregion
-
+		//glDrawArrays(GL_TRIANGLES, 0, 6);
 #pragma endregion
 
 		glfwPollEvents();
@@ -314,6 +258,26 @@ void processInput(GLFWwindow *window)
 	else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 		camera.Position += camera.Up*camera.MovementSpeed;
 	else return;
+}
+
+unsigned int LoadImageToGPU(const char* filename, GLint internalformat, GLenum format, int slot)
+{
+	unsigned int TexBuffer;
+	glGenTextures(1, &TexBuffer);
+	glActiveTexture(GL_TEXTURE0+slot);
+	glBindTexture(GL_TEXTURE_2D, TexBuffer);
+	int width, height, nrChannel;
+	stbi_set_flip_vertically_on_load(true); // 颠倒载入
+	unsigned char *data = stbi_load(filename, &width, &height, &nrChannel, 0);
+	if (data) {
+		glTexImage2D(GL_TEXTURE_2D, 0, internalformat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else {
+		printf("load image failed.");
+	}
+	stbi_image_free(data);
+	return TexBuffer;
 }
 
 void mouse_callback(GLFWwindow * window, double xpos, double ypos)

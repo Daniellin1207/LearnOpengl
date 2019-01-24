@@ -32,6 +32,6 @@ void main()
 	vec3 diffuse=max(dot(lightDir,Normal),0)*lightColor*texture(material.diffuse,TexCoord).rgb;
 //	vec3 diffuse=texture(material.diffuse,TexCoord).rgb;
 	// ambient
-	vec3 ambient=material.ambient*ambientColor;
+	vec3 ambient=material.ambient*ambientColor*texture(material.diffuse,TexCoord).rgb;
 	FragColor=vec4((ambient+diffuse+specular)*objColor,1.0);
 }									

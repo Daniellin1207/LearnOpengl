@@ -23,6 +23,7 @@ using namespace std;
 #include "Camera.h"
 #include "Material.h"
 #include "LightDirectional.h"
+#include "LightPoint.h"
 #pragma endregion
 
 #pragma region Camera Declare
@@ -30,8 +31,8 @@ Camera camera(glm::vec3(0, 0.0, 3.0f), 10.0f,0.0f, glm::vec3(0, 1.0f, 0));
 #pragma endregion
 
 #pragma region Light Declare
-LightDirectional light = LightDirectional(
-	glm::vec3(0.0f, 0.0f, 10.0f),
+LightPoint light = LightPoint(
+	glm::vec3(1, 1, -1),
 	glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
 	glm::vec3(1.0f, 1.0f, 1.0f)
 );
@@ -235,9 +236,14 @@ int main()
 			// ´«Light
 			glUniform3f(glGetUniformLocation(testShader->ID, "objColor"),1,1,1);
 			glUniform3f(glGetUniformLocation(testShader->ID, "ambientColor"),0.5,0.5,0.5);
+
 			glUniform3f(glGetUniformLocation(testShader->ID, "lightPos"), light.position.x,light.position.y,light.position.z);
 			glUniform3f(glGetUniformLocation(testShader->ID, "lightColor"), light.color.x, light.color.y, light.color.z);
-			glUniform3f(glGetUniformLocation(testShader->ID, "lightDir"), light.direction.x, light.direction.y, light.direction.z);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightDirUniform"), light.direction.x, light.direction.y, light.direction.z);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightP.constant"), light.constant);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightP.linear"), light.linear);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightP.quadratic"), light.quadratic);
+
 			glUniform3f(glGetUniformLocation(testShader->ID, "cameraPos"),camera.Position.x,camera.Position.y,camera.Position.z);
 
 			myMaterial->shader->SetUniform3f("material.ambient", myMaterial->ambient);

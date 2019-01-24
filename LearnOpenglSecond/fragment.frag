@@ -10,11 +10,18 @@ struct Material{
 	float shininess;
 };
 
+struct LightPoint{
+	float constant;
+	float linear;
+	float quadratic;
+};
+
+uniform LightPoint lightP;
 uniform Material material;
 uniform vec3 objColor;
 uniform vec3 lightColor;
 uniform vec3 ambientColor;
-uniform vec3 lightDir;
+uniform vec3 lightDirUniform;
 uniform vec3 lightPos;
 uniform vec3 cameraPos;
 
@@ -22,15 +29,18 @@ out vec4 FragColor;
 
 void main()					
 {				
-//	vec3 lightDir=normalize(lightPos-FragPos);
+	float dist=length(lightPos-FragPos);
+	float attenuation=1/(lightP.constant+lightP.linear*dist+lightP.quadratic*dist*dist);
+
+	vec3 lightDir=normalize(lightPos-FragPos);
 	vec3 reflectVec=reflect(-lightDir,Normal);
 	vec3 cameraVec=normalize(cameraPos-FragPos);
 
 	// specular
 	float specularAmount=pow(max(dot(reflectVec,cameraVec),0),material.shininess);
-	vec3 specular=texture(material.specular,TexCoord).rgb*specularAmount*lightColor;
+	vec3 specular=texture(material.specular,TexCoord).rgb*specularAmount*lightColor*attenuation;
 	// diffuse
-	vec3 diffuse=max(dot(lightDir,Normal),0)*lightColor*texture(material.diffuse,TexCoord).rgb;
+	vec3 diffuse=max(dot(lightDir,Normal),0)*lightColor*texture(material.diffuse,TexCoord).rgb*attenuation;
 //	vec3 diffuse=texture(material.diffuse,TexCoord).rgb;
 	// ambient
 	vec3 ambient=material.ambient*ambientColor*texture(material.diffuse,TexCoord).rgb;

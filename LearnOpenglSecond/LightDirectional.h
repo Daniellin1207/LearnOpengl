@@ -21,7 +21,5 @@ public:
 		direction = -direction;
 
 	}
-
-
 };
 

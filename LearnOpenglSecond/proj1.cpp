@@ -1,16 +1,12 @@
 #pragma region include
 #include "pch.h"
+
+#include <iostream>
+using namespace std;
+
 #define GLEW_STATIC
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
-
-#include "Shader.h"
-
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
-#include <assimp/scene.h>
-using namespace std;
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -19,12 +15,26 @@ using namespace std;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+
+#include "Shader.h"
 #include "Camera.h"
 #include "Material.h"
+#include "LightDirectional.h"
 #pragma endregion
 
 #pragma region Camera Declare
 Camera camera(glm::vec3(0, 0.0, 3.0f), 10.0f,0.0f, glm::vec3(0, 1.0f, 0));
+#pragma endregion
+
+#pragma region Light Declare
+LightDirectional light = LightDirectional(
+	glm::vec3(0.0f, 0.0f, 10.0f),
+	glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
+	glm::vec3(1.0f, 1.0f, 1.0f)
+);
 #pragma endregion
 
 #pragma region Funcion Declare
@@ -148,7 +158,7 @@ int main()
 		LoadImageToGPU("container2.png", GL_RGBA, GL_RGBA, 0),
 		LoadImageToGPU("container2_specular.png", GL_RGBA, GL_RGBA, 1),
 		glm::vec3(0.1, 0.1, 0.1),
-		64.0f);
+		32.0f);
 #pragma endregion
 
 #pragma region VAO and VBO
@@ -195,10 +205,12 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 #pragma endregion
 
+#pragma region Activate Texture in Circle
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, myMaterial->diffuse);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, myMaterial->specular);
+#pragma endregion
 
 #pragma region TenCube Drawing
 		testShader->use();
@@ -223,10 +235,9 @@ int main()
 			// ´«Light
 			glUniform3f(glGetUniformLocation(testShader->ID, "objColor"),1,1,1);
 			glUniform3f(glGetUniformLocation(testShader->ID, "ambientColor"),0.5,0.5,0.5);
-			glUniform3f(glGetUniformLocation(testShader->ID, "lightPos"),10,10,10);
-			glUniform3f(glGetUniformLocation(testShader->ID, "lightColor"),1,1,1);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightPos"), light.position.x,light.position.y,light.position.z);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightColor"), light.color.x, light.color.y, light.color.z);
 			glUniform3f(glGetUniformLocation(testShader->ID, "cameraPos"),camera.Position.x,camera.Position.y,camera.Position.z);
-
 
 			myMaterial->shader->SetUniform3f("material.ambient", myMaterial->ambient);
 			myMaterial->shader->SetUniform1i("material.diffuse", Shader::DIFFUSE);

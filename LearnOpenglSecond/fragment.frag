@@ -14,6 +14,7 @@ uniform Material material;
 uniform vec3 objColor;
 uniform vec3 lightColor;
 uniform vec3 ambientColor;
+uniform vec3 lightDir;
 uniform vec3 lightPos;
 uniform vec3 cameraPos;
 
@@ -21,7 +22,7 @@ out vec4 FragColor;
 
 void main()					
 {				
-	vec3 lightDir=normalize(lightPos-FragPos);
+//	vec3 lightDir=normalize(lightPos-FragPos);
 	vec3 reflectVec=reflect(-lightDir,Normal);
 	vec3 cameraVec=normalize(cameraPos-FragPos);
 

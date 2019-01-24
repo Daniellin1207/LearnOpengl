@@ -237,6 +237,7 @@ int main()
 			glUniform3f(glGetUniformLocation(testShader->ID, "ambientColor"),0.5,0.5,0.5);
 			glUniform3f(glGetUniformLocation(testShader->ID, "lightPos"), light.position.x,light.position.y,light.position.z);
 			glUniform3f(glGetUniformLocation(testShader->ID, "lightColor"), light.color.x, light.color.y, light.color.z);
+			glUniform3f(glGetUniformLocation(testShader->ID, "lightDir"), light.direction.x, light.direction.y, light.direction.z);
 			glUniform3f(glGetUniformLocation(testShader->ID, "cameraPos"),camera.Position.x,camera.Position.y,camera.Position.z);
 
 			myMaterial->shader->SetUniform3f("material.ambient", myMaterial->ambient);

@@ -192,7 +192,6 @@ int main()
 
 #pragma region TenCube Drawing
 		testShader->use();
-		glBindVertexArray(VAOs[0]);
 		glm::mat4 viewMat = glm::mat4(1.0f);
 		glm::mat4 modelMat = glm::mat4(1.0f);
 		glm::mat4 projMat = glm::mat4(1.0f); 
@@ -218,6 +217,14 @@ int main()
 			glUniform3f(glGetUniformLocation(testShader->ID, "lightColor"),1.0,0,0);
 			glUniform3f(glGetUniformLocation(testShader->ID, "cameraPos"),camera.Position.x,camera.Position.y,camera.Position.z);
 
+
+			glUniform3f(glGetUniformLocation(testShader->ID, "material.ambient"), 1.0, 1.0, 1.0);
+			glUniform3f(glGetUniformLocation(testShader->ID, "material.diffuse"), 0, 0, 1.0);
+			glUniform3f(glGetUniformLocation(testShader->ID, "material.specular"),0, 1.0, 0);
+			glUniform1f(glGetUniformLocation(testShader->ID, "material.shininess"),64.0f);
+
+
+			glBindVertexArray(VAOs[0]);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 #pragma endregion

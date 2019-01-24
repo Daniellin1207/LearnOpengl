@@ -20,6 +20,7 @@ using namespace std;
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Camera.h"
+#include "Material.h"
 #pragma endregion
 
 #pragma region Camera Declare
@@ -141,6 +142,14 @@ int main()
 	Shader* myShader = new Shader("VertLight.vert", "FragLight.frag");
 #pragma endregion
 
+#pragma region Material
+	Material* myMaterial = new Material(testShader,
+		glm::vec3(0,0, 1.0),
+		glm::vec3(1.0, 1.0, 1.0),
+		glm::vec3(1.0, 1.0, 1.0),
+		32.0f);
+#pragma endregion
+
 #pragma region VAO and VBO
 	unsigned int VAOs[2], VBOs[2], EBOs;
 
@@ -218,10 +227,10 @@ int main()
 			glUniform3f(glGetUniformLocation(testShader->ID, "cameraPos"),camera.Position.x,camera.Position.y,camera.Position.z);
 
 
-			glUniform3f(glGetUniformLocation(testShader->ID, "material.ambient"), 1.0, 1.0, 1.0);
-			glUniform3f(glGetUniformLocation(testShader->ID, "material.diffuse"), 0, 0, 1.0);
-			glUniform3f(glGetUniformLocation(testShader->ID, "material.specular"),0, 1.0, 0);
-			glUniform1f(glGetUniformLocation(testShader->ID, "material.shininess"),64.0f);
+			myMaterial->shader->SetUniform3f("material.ambient", myMaterial->ambient);
+			myMaterial->shader->SetUniform3f("material.diffuse", myMaterial->diffuse);
+			myMaterial->shader->SetUniform3f("material.specular", myMaterial->specular);
+			myMaterial->shader->SetUniform1f("material.shininess", myMaterial->shininess);
 
 
 			glBindVertexArray(VAOs[0]);

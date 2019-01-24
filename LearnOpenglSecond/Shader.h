@@ -1,15 +1,17 @@
 #pragma once
 
 #include <string>
+#include <iostream>
 #include <fstream>
 #include <sstream>
+using namespace std;
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #define GLEW_STATIC
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
-using namespace std;
-
-
 
 class Shader
 {
@@ -21,6 +23,8 @@ public:
 	const char* vertexSource;
 	const char* fragmentSource;
 	void use();
+	void SetUniform3f(const char* paramNameString, glm::vec3 param);
+	void SetUniform1f(const char* paramNameString, float param);
 private:
 	void checkCompileErrors(unsigned int ID, std::string type);
 };

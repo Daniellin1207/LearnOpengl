@@ -6,7 +6,7 @@ in vec2 TexCoord;
 struct Material{
 	vec3 ambient;
 	sampler2D diffuse;
-	vec3 specular;
+	sampler2D specular;
 	float shininess;
 };
 
@@ -27,7 +27,7 @@ void main()
 
 	// specular
 	float specularAmount=pow(max(dot(reflectVec,cameraVec),0),material.shininess);
-	vec3 specular=material.specular*specularAmount*lightColor;
+	vec3 specular=texture(material.specular,TexCoord).rgb*specularAmount*lightColor;
 	// diffuse
 	vec3 diffuse=max(dot(lightDir,Normal),0)*lightColor*texture(material.diffuse,TexCoord).rgb;
 //	vec3 diffuse=texture(material.diffuse,TexCoord).rgb;

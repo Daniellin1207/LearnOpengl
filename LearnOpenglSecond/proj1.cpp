@@ -146,9 +146,9 @@ int main()
 #pragma region Material
 	Material* myMaterial = new Material(testShader,
 		LoadImageToGPU("container2.png", GL_RGBA, GL_RGBA, 0),
-		glm::vec3(1.0, 1.0, 1.0),
+		LoadImageToGPU("container2_specular.png", GL_RGBA, GL_RGBA, 1),
 		glm::vec3(0.1, 0.1, 0.1),
-		32.0f);
+		64.0f);
 #pragma endregion
 
 #pragma region VAO and VBO
@@ -195,10 +195,10 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 #pragma endregion
 
-		//glActiveTexture(GL_TEXTURE0);
-		//glBindTexture(GL_TEXTURE_2D, TexBufferA);
-		//glActiveTexture(GL_TEXTURE1);
-		//glBindTexture(GL_TEXTURE_2D, TexBufferB);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, myMaterial->diffuse);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, myMaterial->specular);
 
 #pragma region TenCube Drawing
 		testShader->use();
@@ -229,8 +229,8 @@ int main()
 
 
 			myMaterial->shader->SetUniform3f("material.ambient", myMaterial->ambient);
-			myMaterial->shader->SetUniform1i("material.diffuse", 0);
-			myMaterial->shader->SetUniform3f("material.specular", myMaterial->specular);
+			myMaterial->shader->SetUniform1i("material.diffuse", Shader::DIFFUSE);
+			myMaterial->shader->SetUniform1i("material.specular",Shader::SPECULAR);
 			myMaterial->shader->SetUniform1f("material.shininess", myMaterial->shininess);
 
 

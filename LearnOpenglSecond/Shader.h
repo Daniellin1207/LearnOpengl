@@ -22,6 +22,12 @@ public:
 	string fragmentString;
 	const char* vertexSource;
 	const char* fragmentSource;
+
+	enum {
+		DIFFUSE,
+		SPECULAR
+	};
+
 	void use();
 	void SetUniform3f(const char* paramNameString, glm::vec3 param);
 	void SetUniform1f(const char* paramNameString, float param);

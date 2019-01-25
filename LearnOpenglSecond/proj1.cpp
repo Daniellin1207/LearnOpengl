@@ -32,33 +32,33 @@ Camera camera(glm::vec3(0, 0.0, 3.0f),10.0f,0.0f, glm::vec3(0, 1.0f, 0));
 #pragma endregion
 
 #pragma region Light Declare
-LightDirectional lightD = LightDirectional(
+LightDirectional lightD(
 	glm::vec3(1,1,-1),
 	glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
 	glm::vec3(1.0f, 1.0f, 1.0f)
 );
 
-LightPoint lightP1 = LightPoint(
+LightPoint lightP1(
 	glm::vec3(30,0,0),
 	glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
 	glm::vec3(1.0f, 0,0)
 );
-LightPoint lightP2 = LightPoint(
+LightPoint lightP2(
 	glm::vec3(0,30,0),
 	glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
 	glm::vec3(0, 1.0f,0)
 );
-LightPoint lightP3 = LightPoint(
+LightPoint lightP3(
 	glm::vec3(0,0,30),
 	glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
 	glm::vec3(0,0, 1.0f)
 );
-LightPoint lightP4 = LightPoint(
+LightPoint lightP4(
 	glm::vec3(-30,0,-30),
 	glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
 	glm::vec3(1.0f, 1.0f, 1.0f)
 );
-LightSpot lightS = LightSpot(
+LightSpot lightS(
 	glm::vec3(0, 3, 0),
 	glm::vec3(glm::radians(90.0f), 0, 0),
 	glm::vec3(1.0f, 1.0f, 1.0f)

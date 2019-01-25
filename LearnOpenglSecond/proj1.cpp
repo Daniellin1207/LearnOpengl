@@ -25,6 +25,8 @@ using namespace std;
 #include "LightDirectional.h"
 #include "LightPoint.h"
 #include "LightSpot.h"
+
+#include "Mesh.h"
 #pragma endregion
 
 #pragma region Camera Declare
@@ -190,31 +192,38 @@ int main()
 #pragma endregion
 
 #pragma region VAO and VBO
-	unsigned int VAOs[2], VBOs[2], EBOs;
 
-	glGenVertexArrays(2, VAOs); // GenBuffers
-	glGenBuffers(2, VBOs);
-	//glGenBuffers(1, &EBO);
-	glBindVertexArray(VAOs[0]);  // BindBuffers
-	glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // BindDatas
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
+	Mesh cube(vertices);
 
-	glBindVertexArray(VAOs[1]);
-	// 只需要绑定VBO不用再次设置VBO的数据，因为箱子的VBO数据中已经包含了正确的立方体顶点数据
-	glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
-	// 设置灯立方体的顶点属性（对我们的灯来说仅仅只有位置数据）
-	glBufferData(GL_ARRAY_BUFFER, sizeof(lightCube), lightCube, GL_STATIC_DRAW); // BindDatas
+
+	//unsigned int VAOs[2], VBOs[2], EBOs;
+
+	//glGenVertexArrays(2, VAOs); // GenBuffers
+	//glGenBuffers(2, VBOs);
+	////glGenBuffers(1, &EBO);
+
+	//glBindVertexArray(VAOs[0]);  // BindBuffers
+	//glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
+	////glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
 	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // BindDatas
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
+	////glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	//glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	//glEnableVertexAttribArray(1);
+	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	//glEnableVertexAttribArray(2);
+
+	//glBindVertexArray(VAOs[1]);
+	//// 只需要绑定VBO不用再次设置VBO的数据，因为箱子的VBO数据中已经包含了正确的立方体顶点数据
+	//glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
+	//// 设置灯立方体的顶点属性（对我们的灯来说仅仅只有位置数据）
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(lightCube), lightCube, GL_STATIC_DRAW); // BindDatas
+	////glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // BindDatas
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	//glEnableVertexAttribArray(0);
 
 #pragma endregion
 
@@ -234,10 +243,10 @@ int main()
 #pragma endregion
 
 #pragma region Activate Texture in Circle
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, myMaterial->diffuse);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, myMaterial->specular);
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, myMaterial->diffuse);
+		//glActiveTexture(GL_TEXTURE1);
+		//glBindTexture(GL_TEXTURE_2D, myMaterial->specular);
 #pragma endregion
 
 #pragma region TenCube Drawing
@@ -245,7 +254,7 @@ int main()
 		glm::mat4 viewMat = glm::mat4(1.0f);
 		glm::mat4 modelMat = glm::mat4(1.0f);
 		glm::mat4 projMat = glm::mat4(1.0f); 
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 1; i++)
 		{
 			float angle = 20.0f*i+10.0;
 			modelMat = glm::mat4(1.0f);
@@ -314,18 +323,19 @@ int main()
 			myMaterial->shader->SetUniform1f("material.shininess", myMaterial->shininess);
 
 
-			glBindVertexArray(VAOs[0]);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
+			//glBindVertexArray(VAOs[0]);
+			//glDrawArrays(GL_TRIANGLES, 0, 36);
+			cube.draw(myMaterial->shader);
 		}
 #pragma endregion
 
 #pragma region Operation myShader 
-		myShader->use();
-		glBindVertexArray(VAOs[1]);
-		glUniformMatrix4fv(glGetUniformLocation(myShader->ID, "modelMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
-		glUniformMatrix4fv(glGetUniformLocation(myShader->ID, "viewMat"), 1, GL_FALSE, glm::value_ptr(viewMat));
-		glUniformMatrix4fv(glGetUniformLocation(myShader->ID, "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		//myShader->use();
+		//glBindVertexArray(VAOs[1]);
+		//glUniformMatrix4fv(glGetUniformLocation(myShader->ID, "modelMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
+		//glUniformMatrix4fv(glGetUniformLocation(myShader->ID, "viewMat"), 1, GL_FALSE, glm::value_ptr(viewMat));
+		//glUniformMatrix4fv(glGetUniformLocation(myShader->ID, "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
+		//glDrawArrays(GL_TRIANGLES, 0, 6);
 #pragma endregion
 
 		glfwPollEvents();

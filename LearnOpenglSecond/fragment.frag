@@ -113,15 +113,15 @@ vec3 CalcLightSpot(LightSpot light,vec3 uNormal,vec3 dirToCamera){
 
 void main()					
 {
-	vec3 finalResult=vec3(0,0,0);
+	vec3 finalResult=vec3(0.2,0.2,0.2);
 	vec3 uNormal=normalize(Normal);
 	vec3 dirToCamera=normalize(cameraPos-FragPos);
 	finalResult+=CalcLightDirectional(lightD,uNormal,dirToCamera);
-	finalResult+=CalcLightPoint(lightP1,uNormal,dirToCamera);
-	finalResult+=CalcLightPoint(lightP2,uNormal,dirToCamera);
-	finalResult+=CalcLightPoint(lightP3,uNormal,dirToCamera);
-	finalResult+=CalcLightPoint(lightP4,uNormal,dirToCamera);
-	finalResult+=CalcLightSpot(lightS,uNormal,dirToCamera);
+//	finalResult+=CalcLightPoint(lightP1,uNormal,dirToCamera);
+//	finalResult+=CalcLightPoint(lightP2,uNormal,dirToCamera);
+//	finalResult+=CalcLightPoint(lightP3,uNormal,dirToCamera);
+//	finalResult+=CalcLightPoint(lightP4,uNormal,dirToCamera);
+//	finalResult+=CalcLightSpot(lightS,uNormal,dirToCamera);
 
 	FragColor=vec4(finalResult,1);
 }									

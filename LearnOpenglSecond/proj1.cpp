@@ -27,6 +27,7 @@ using namespace std;
 #include "LightSpot.h"
 
 #include "Mesh.h"
+#include "Model.h"
 #pragma endregion
 
 #pragma region Camera Declare
@@ -146,8 +147,12 @@ float lightCube[] = {
 	0.5,0.5,2.0};
 #pragma endregion
 
-int main()
+int main(int argc,char* argv[])
 {
+	//printf("%s\n", argv[0]);
+	std::string exePath = argv[0];
+	//std::cout << exePath.substr(0, exePath.find_last_not_of('\\')) + "\\model\\nanosuit.obj" << std::endl;
+
 #pragma region Init Setting
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -163,7 +168,7 @@ int main()
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -193,10 +198,8 @@ int main()
 
 #pragma region VAO and VBO
 
-	Mesh cube(vertices);
-
-
-	//unsigned int VAOs[2], VBOs[2], EBOs;
+	//Mesh cube(vertices);
+	Model model(exePath.substr(0, exePath.find_last_of('\\')) + "\\model\\nanosuit.obj");
 
 	//glGenVertexArrays(2, VAOs); // GenBuffers
 	//glGenBuffers(2, VBOs);
@@ -325,7 +328,8 @@ int main()
 
 			//glBindVertexArray(VAOs[0]);
 			//glDrawArrays(GL_TRIANGLES, 0, 36);
-			cube.draw(myMaterial->shader);
+			//cube.draw(myMaterial->shader);
+			model.Draw(myMaterial->shader);
 		}
 #pragma endregion
 
@@ -404,13 +408,13 @@ void mouse_callback(GLFWwindow * window, double xpos, double ypos)
 
 	lastX = xpos;
 	lastY = ypos;
-	printf("mouseDelta: %f %f\n", deltaX, deltaY);
+	//printf("mouseDelta: %f %f\n", deltaX, deltaY);
 	camera.ProcessMouseMovement(deltaX, -deltaY);
 }
 
 void scroll_callback(GLFWwindow * window, double xoffset, double yoffset)
 {
-	printf("mouseScroll: %f %f\n", xoffset, yoffset);
+	//printf("mouseScroll: %f %f\n", xoffset, yoffset);
 	camera.ProcessMouseScroll(yoffset);
 }
 #pragma endregion

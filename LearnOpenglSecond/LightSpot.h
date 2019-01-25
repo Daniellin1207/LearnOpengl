@@ -25,7 +25,7 @@ public:
 		direction = glm::rotateZ(direction, angles.z);
 		direction = glm::rotateX(direction, angles.x);
 		direction = glm::rotateY(direction, angles.y);
-		//direction = -direction;
+		direction = -direction;
 	};
 };
 

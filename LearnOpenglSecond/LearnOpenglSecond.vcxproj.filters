@@ -36,6 +36,9 @@
     <ClInclude Include="LightDirectional.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="LightSpot.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -57,6 +60,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="LightDirectional.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="LightSpot.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

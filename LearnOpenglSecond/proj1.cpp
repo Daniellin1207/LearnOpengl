@@ -24,16 +24,17 @@ using namespace std;
 #include "Material.h"
 #include "LightDirectional.h"
 #include "LightPoint.h"
+#include "LightSpot.h"
 #pragma endregion
 
 #pragma region Camera Declare
-Camera camera(glm::vec3(0, 0.0, 3.0f), 10.0f,0.0f, glm::vec3(0, 1.0f, 0));
+Camera camera(glm::vec3(0, 0.0, 3.0f),10.0f,0.0f, glm::vec3(0, 1.0f, 0));
 #pragma endregion
 
 #pragma region Light Declare
-LightPoint light = LightPoint(
-	glm::vec3(1, 1, -1),
-	glm::vec3(glm::radians(45.0f), glm::radians(45.0f), 0),
+LightSpot light = LightSpot(
+	glm::vec3(0, 2, 0),
+	glm::vec3(glm::radians(90.0f), 0, 0),
 	glm::vec3(1.0f, 1.0f, 1.0f)
 );
 #pragma endregion
@@ -240,9 +241,12 @@ int main()
 			glUniform3f(glGetUniformLocation(testShader->ID, "lightPos"), light.position.x,light.position.y,light.position.z);
 			glUniform3f(glGetUniformLocation(testShader->ID, "lightColor"), light.color.x, light.color.y, light.color.z);
 			glUniform3f(glGetUniformLocation(testShader->ID, "lightDirUniform"), light.direction.x, light.direction.y, light.direction.z);
-			glUniform1f(glGetUniformLocation(testShader->ID, "lightP.constant"), light.constant);
-			glUniform1f(glGetUniformLocation(testShader->ID, "lightP.linear"), light.linear);
-			glUniform1f(glGetUniformLocation(testShader->ID, "lightP.quadratic"), light.quadratic);
+
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightS.cosPhyInner"), light.cosPhyInner);
+			glUniform1f(glGetUniformLocation(testShader->ID, "lightS.cosPhyOutter"), light.cosPhyOutter);
+			//glUniform1f(glGetUniformLocation(testShader->ID, "lightP.constant"), light.constant);
+			//glUniform1f(glGetUniformLocation(testShader->ID, "lightP.linear"), light.linear);
+			//glUniform1f(glGetUniformLocation(testShader->ID, "lightP.quadratic"), light.quadratic);
 
 			glUniform3f(glGetUniformLocation(testShader->ID, "cameraPos"),camera.Position.x,camera.Position.y,camera.Position.z);
 
@@ -263,7 +267,7 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(myShader->ID, "modelMat"), 1, GL_FALSE, glm::value_ptr(modelMat));
 		glUniformMatrix4fv(glGetUniformLocation(myShader->ID, "viewMat"), 1, GL_FALSE, glm::value_ptr(viewMat));
 		glUniformMatrix4fv(glGetUniformLocation(myShader->ID, "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
-		//glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 #pragma endregion
 
 		glfwPollEvents();

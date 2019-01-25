@@ -16,6 +16,12 @@ struct LightPoint{
 	float quadratic;
 };
 
+struct LightSpot{
+	float cosPhyInner;
+	float cosPhyOutter;
+};
+
+uniform LightSpot lightS;
 uniform LightPoint lightP;
 uniform Material material;
 uniform vec3 objColor;
@@ -29,8 +35,8 @@ out vec4 FragColor;
 
 void main()					
 {				
-	float dist=length(lightPos-FragPos);
-	float attenuation=1/(lightP.constant+lightP.linear*dist+lightP.quadratic*dist*dist);
+//	float dist=length(lightPos-FragPos);
+//	float attenuation=1/(lightP.constant+lightP.linear*dist+lightP.quadratic*dist*dist);
 
 	vec3 lightDir=normalize(lightPos-FragPos);
 	vec3 reflectVec=reflect(-lightDir,Normal);
@@ -38,11 +44,24 @@ void main()
 
 	// specular
 	float specularAmount=pow(max(dot(reflectVec,cameraVec),0),material.shininess);
-	vec3 specular=texture(material.specular,TexCoord).rgb*specularAmount*lightColor*attenuation;
+	vec3 specular=texture(material.specular,TexCoord).rgb*specularAmount*lightColor;
 	// diffuse
-	vec3 diffuse=max(dot(lightDir,Normal),0)*lightColor*texture(material.diffuse,TexCoord).rgb*attenuation;
-//	vec3 diffuse=texture(material.diffuse,TexCoord).rgb;
+	float diffuseAmount=max(dot(lightDir,Normal),0);
+	vec3 diffuse=texture(material.diffuse,TexCoord).rgb*diffuseAmount*lightColor;
 	// ambient
 	vec3 ambient=material.ambient*ambientColor*texture(material.diffuse,TexCoord).rgb;
-	FragColor=vec4((ambient+diffuse+specular)*objColor,1.0);
+
+	float cosTheta=dot(normalize(FragPos-lightPos),lightDirUniform);
+	float spotRatio;
+	if(cosTheta>lightS.cosPhyInner){
+		// inside
+		spotRatio=1.0;
+		FragColor=vec4((ambient+diffuse+specular)*objColor,1.0);
+	}else if(cosTheta>lightS.cosPhyOutter){
+		// outside
+		spotRatio=(cosTheta-lightS.cosPhyOutter)/(lightS.cosPhyInner-lightS.cosPhyOutter);
+	}else{
+		spotRatio=0;
+	};
+	FragColor=vec4((ambient+(diffuse+specular)*spotRatio)*objColor,1.0);
 }									
